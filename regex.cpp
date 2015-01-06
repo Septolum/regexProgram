@@ -29,13 +29,18 @@ bool global = false;
 bool replaceMode = false;
 bool match = false;
 bool finished = false;
+bool skip = false;
 
 static const int CTRL_E = 5;
 static const int CTRL_G = 7;
 
 void mouseAction(int mx, int my)
 {
-    if (my == 2)
+	if (my == 3 && mx < 6)
+	{
+		skip = true;
+	}
+    else if (my == 2)
     {
         if (mx < 27)
             extended = !extended;
@@ -122,7 +127,11 @@ void keyAction( int ch )
 
 bool checkSolution()
 {
-    if (replaceMode)
+	if (skip == true)
+	{
+		return true;
+	}
+    else if (replaceMode)
     {
         if (replaced.size() != replaceSolutions.size())
             return false;
@@ -283,6 +292,10 @@ void drawScreen()
             }
         }
     }
+	move (3, 0);
+	attron(COLOR_PAIR(4));
+	addstr("Skip?");
+	attroff(COLOR_PAIR(4));
     move(y, x+16);
 }
 
@@ -436,6 +449,7 @@ void initCurses()
     init_pair(1, COLOR_BLACK, COLOR_GREEN);
     init_pair(2, COLOR_BLACK, COLOR_BLUE);
     init_pair(3, COLOR_GREEN, COLOR_BLACK);
+    init_pair(4, COLOR_RED, COLOR_BLACK);
 }
 
 
@@ -453,6 +467,7 @@ int main ()
             replacePattern = "";
             x = 0;
             y = 0;
+            skip = false;
             if (level == 10)
                 break;
             level++;
